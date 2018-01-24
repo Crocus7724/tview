@@ -30,6 +30,8 @@ type Application struct {
 	// event to be forwarded to the default input handler (nil if nothing should
 	// be forwarded).
 	inputCapture func(event *tcell.EventKey) *tcell.EventKey
+
+	mouseGesture func(event *tcell.EventMouse) *tcell.EventMouse
 }
 
 // NewApplication creates and returns a new application.
@@ -51,6 +53,11 @@ func (a *Application) SetInputCapture(capture func(event *tcell.EventKey) *tcell
 	return a
 }
 
+func (a *Application) SetMouseGesture(gesture func(event *tcell.EventMouse) *tcell.EventMouse) *Application {
+	a.mouseGesture = gesture
+	return a
+}
+
 // Run starts the application and thus the event loop. This function returns
 // when Stop() was called.
 func (a *Application) Run() error {
@@ -67,6 +74,7 @@ func (a *Application) Run() error {
 		a.Unlock()
 		return err
 	}
+	a.screen.EnableMouse()
 
 	// We catch panics to clean up because they mess up the terminal.
 	defer func() {
@@ -135,6 +143,28 @@ func (a *Application) Run() error {
 			a.Unlock()
 			screen.Clear()
 			a.Draw()
+		case *tcell.EventMouse:
+			a.RLock()
+			p := a.focus
+			a.RUnlock()
+
+			if a.mouseGesture != nil {
+				event = a.mouseGesture(event)
+				if event == nil {
+					break
+				}
+			}
+
+			if p != nil {
+				if g, ok := p.(GesturablePrimitive); ok {
+					if handler := g.GestureHandler(); handler != nil {
+						handler(event, func(p Primitive) {
+							a.SetFocus(p)
+						})
+						a.Draw()
+					}
+				}
+			}
 		}
 	}
 

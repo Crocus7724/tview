@@ -34,6 +34,7 @@ type Primitive interface {
 	// Box.wrapInputHandler() so you inherit that functionality.
 	InputHandler() func(event *tcell.EventKey, setFocus func(p Primitive))
 
+
 	// Focus is called by the application when the primitive receives focus.
 	// Implementers may call delegate() to pass the focus on to another primitive.
 	Focus(delegate func(p Primitive))
@@ -43,4 +44,8 @@ type Primitive interface {
 
 	// GetFocusable returns the item's Focusable.
 	GetFocusable() Focusable
+}
+
+type GesturablePrimitive interface {
+	GestureHandler() func(event *tcell.EventMouse, setFocus func(p Primitive))
 }
