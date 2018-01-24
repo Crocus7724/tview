@@ -4,7 +4,7 @@ import (
 	"sort"
 
 	"github.com/gdamore/tcell"
-	colorful "github.com/lucasb-eyer/go-colorful"
+	"github.com/lucasb-eyer/go-colorful"
 )
 
 // TableCell represents one cell inside a Table. You can instantiate this type
@@ -675,14 +675,14 @@ ColumnLoop:
 			for bx := 0; bx < w && fromX+bx < x+width; bx++ {
 				m, c, style, _ := screen.GetContent(fromX+bx, fromY+by)
 				if selected {
-					fg, _, _ := style.Decompose()
-					if fg == textColor || fg == t.bordersColor {
-						fg = backgroundColor
-					}
-					if fg == tcell.ColorDefault {
-						fg = t.backgroundColor
-					}
-					style = style.Background(textColor).Foreground(fg)
+					//fg, _, _ := style.Decompose()
+					//if fg == textColor || fg == t.bordersColor {
+					//	fg = backgroundColor
+					//}
+					//if fg == tcell.ColorDefault {
+					//	fg = t.backgroundColor
+					//}
+					style = style.Background(textColor).Foreground(backgroundColor)
 				} else {
 					if backgroundColor == tcell.ColorDefault {
 						continue
@@ -752,7 +752,7 @@ ColumnLoop:
 		entries := cellsByBackgroundColor[bgColor]
 		for _, cell := range entries {
 			if cell.selected {
-				defer colorBackground(cell.x, cell.y, cell.w, cell.h, bgColor, cell.text, true)
+				defer colorBackground(cell.x, cell.y, cell.w, cell.h, tcell.ColorLightGray, tcell.ColorGreen, true)
 			} else {
 				colorBackground(cell.x, cell.y, cell.w, cell.h, bgColor, cell.text, false)
 			}
